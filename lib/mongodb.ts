@@ -1,4 +1,3 @@
-// /lib/mongodb.ts
 import { MongoClient } from "mongodb";
 
 const uri = process.env.MONGODB_URI!;
@@ -27,3 +26,4 @@ if (process.env.NODE_ENV === "development") {
 }
 
 export default clientPromise;
+
