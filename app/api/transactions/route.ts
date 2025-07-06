@@ -1,21 +1,31 @@
+// app/api/transactions/route.ts
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 
 export async function GET() {
   const client = await clientPromise;
   const db = client.db("finance");
-  const transactions = await db.collection("transactions").find({}).sort({ date: -1 }).toArray();
+  const transactions = await db
+    .collection("transactions")
+    .find({})
+    .sort({ date: -1 })
+    .toArray();
   return NextResponse.json(transactions);
 }
 
-export async function POST(req: Request) {
-  const { amount, description, date } = await req.json();
+export async function POST(request: Request) {
   const client = await clientPromise;
   const db = client.db("finance");
+
+  const body = await request.json();
+  const { amount, description, date, category } = body;
+
   const result = await db.collection("transactions").insertOne({
-    amount: Number(amount),
+    amount,
     description,
-    date: new Date(date),
+    date,
+    category,
   });
+
   return NextResponse.json({ insertedId: result.insertedId });
 }
