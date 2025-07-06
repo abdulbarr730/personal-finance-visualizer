@@ -13,8 +13,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import axios from "axios";
-
-// ✅ TypeScript type for each transaction
 type Transaction = {
   _id?: string;
   amount: number;
