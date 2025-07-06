@@ -3,17 +3,24 @@ import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 
-// Must match Next.js App Router's dynamic segment format
 export async function DELETE(
   req: NextRequest,
-  context: { params: Record<string, string> }
-) {
-  const id = context.params.id;
+  context: { params: { id: string } }
+): Promise<NextResponse> {
+  try {
+    const id = context.params.id;
 
-  const client = await clientPromise;
-  const db = client.db("finance");
+    if (!id) {
+      return NextResponse.json({ error: "Missing ID" }, { status: 400 });
+    }
 
-  await db.collection("transactions").deleteOne({ _id: new ObjectId(id) });
+    const client = await clientPromise;
+    const db = client.db("finance");
 
-  return NextResponse.json({ message: "Transaction deleted" });
+    await db.collection("transactions").deleteOne({ _id: new ObjectId(id) });
+
+    return NextResponse.json({ message: "Transaction deleted" });
+  } catch (error) {
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }
