@@ -2,12 +2,16 @@ import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 
-export async function DELETE(request: Request, context: { params: { id: string } }) {
+export async function DELETE(
+  request: Request,
+  context: { params: Record<string, string | string[]> }
+) {
+  const { id } = context.params;
+
   const client = await clientPromise;
   const db = client.db("finance");
 
-  const id = context.params.id;
-  if (!ObjectId.isValid(id)) {
+  if (!id || Array.isArray(id) || !ObjectId.isValid(id)) {
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   }
 
