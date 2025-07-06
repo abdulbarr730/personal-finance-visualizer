@@ -1,17 +1,23 @@
-// app/api/transactions/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 
 export async function DELETE(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
-  const client = await clientPromise;
-  const db = client.db("finance");
-  const id = context.params.id;
+  try {
+    const client = await clientPromise;
+    const db = client.db("finance");
 
-  await db.collection("transactions").deleteOne({ _id: new ObjectId(id) });
+    if (!params?.id) {
+      return NextResponse.json({ error: "Missing transaction ID" }, { status: 400 });
+    }
 
-  return NextResponse.json({ message: "Transaction deleted" });
+    await db.collection("transactions").deleteOne({ _id: new ObjectId(params.id) });
+
+    return NextResponse.json({ message: "Transaction deleted" });
+  } catch (error) {
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }
